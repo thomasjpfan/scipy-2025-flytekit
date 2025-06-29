@@ -82,7 +82,7 @@ class: title-slide
 
 # High level overview of Flyte
 
-- Diagram of Python code -> DAG -> Kubernetes
+# TODO: Diagram of Python code -> DAG -> Kubernetes
 - Audience poll about Containers then Kubernetes
 
 ---
@@ -116,27 +116,29 @@ pyflyte run --remote main.py wf
 
 --
 
-- Collection of tasks
-- Describes data flow
-
 ![](images/workflow.jpg)
 
 ---
 
-# Most Popular Feature
+# Scaling up
+
+# TODO finish up example code
 
 ```python
 from flytekit import map_task
 
 @workflow
 def main():
-	datasets = query_many_datasets()
+	  datasets = query_many_datasets()
+    
 
 ```
 
 ---
 
 # Workflow: Serialized with protobuf
+
+# TODO show protobuf itself
 
 - Workflow can now be managed by Golang
 
@@ -149,6 +151,8 @@ def main():
 def preprocess(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
 	...
 ```
+
+--
 
 ## Pod Specification
 
@@ -165,6 +169,8 @@ Containers:
 ---
 
 # Review high level
+
+# TODO: Add diagram
 - Diagram of Python code -> DAG -> Kubernetes
 
 ---
@@ -187,6 +193,8 @@ from flytekit import Resources
 def train_model(train: pd.DataFrame) -> BaseEstimator:
 	...
 ```
+
+## Pod Spec
 
 ```yaml
 Requests:
@@ -211,6 +219,7 @@ def train_model(...):
 	...
 ```
 
+# Pod Spec
 
 ```yaml
 tolerations:
@@ -225,9 +234,11 @@ tolerations:
 
 ## Prebuilt image
 
+# TODO update image string
+
 ```python
 @task(
-	container_image="..."
+	container_image="ghcr.io/flyteorg"
 )
 def train_model(...):
 ```
