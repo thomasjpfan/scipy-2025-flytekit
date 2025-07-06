@@ -731,13 +731,15 @@ class: top
 
 ---
 
-class: top
-
 # Flyte Deck
 
 .g.g-middle[
 .g-7[
 ```python
+from flytekitplugins.deck.renderer import (
+    FrameProfilingRenderer
+)
+
 @task(enable_deck=True)
 def create_deck():
     # Create HTML snippet
@@ -746,18 +748,6 @@ def create_deck():
         "Frame Rendered",
 *       FrameProfilingRenderer().to_html(df=df)
     )
-```
-
-### Using Python Types
-
-```python
-@task(enable_deck=True)
-def create_deck_with_typing() -> (
-*   Annotated[
-*       pd.DataFrame, DataFrameSummaryRenderer()]
-):
-    df = pd.DataFrame(...)
-    return df
 ```
 ]
 .g-5.g-center[
@@ -772,6 +762,31 @@ def create_deck_with_typing() -> (
 
 ---
 
+# Flyte Deck (With Types)
+
+.g.g-middle[
+.g-7[
+```python
+class DataFrameSummaryRenderer:
+    def to_html(self, df: pd.DataFrame) -> str:
+        # Creates HTML from df
+
+@task(enable_deck=True)
+def create_deck_with_typing() -> (
+*   Annotated[
+*       pd.DataFrame, DataFrameSummaryRenderer()
+*   ]
+):
+    df = pd.DataFrame(...)
+    return df
+```
+]
+.g-5.g-center[
+![:scale 100%](images/deck.jpg)
+]
+]
+
+---
 
 # Retries and caching 📖
 
