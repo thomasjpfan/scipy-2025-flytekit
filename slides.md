@@ -646,15 +646,15 @@ class: top
 
 --
 
-### Task runs in different Containers
+### Task runs in Different Containers 🐳
 
 --
 
-### Data in Object Store
+### Data in Object Store 🏪
 
 --
 
-### Changes Between Executions
+### Location Changes Between Executions 🔄
 
 ---
 
@@ -731,13 +731,41 @@ class: top
 
 ---
 
+class: top
+
 # Flyte Deck
+
+.g.g-middle[
+.g-7[
+```python
+@task(enable_deck=True)
+def create_deck():
+    # Create HTML snippet
+    df = pd.DataFrame(...)
+    Deck(
+        "Frame Rendered",
+*       FrameProfilingRenderer().to_html(df=df)
+    )
+```
+
+### Using Python Types
 
 ```python
 @task(enable_deck=True)
-def query_environment():
-	...
+def create_deck_with_typing() -> (
+*   Annotated[
+*       pd.DataFrame, DataFrameSummaryRenderer()]
+):
+    df = pd.DataFrame(...)
+    return df
 ```
+]
+.g-5.g-center[
+![:scale 100%](images/deck.jpg)
+]
+]
+
+--
 
 - **Output Prefix**: `s3://my-s3-bucket/metadata/.../data/0`
 - Static HTML: `s3://my-s3-bucket/metadata/.../data/0/deck.html`
