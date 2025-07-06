@@ -2,9 +2,17 @@ title: Dive into Flytekit's Internals: A Python SDK to Quickly Bring your Code I
 use_katex: False
 class: title-slide
 
-# Dive into Flytekit's Internals: A Python SDK to Quickly Bring your Code Into Production
+# Dive into Flytekit's Internals
+## A Python SDK to Quickly Bring your Code Into Production
 
-![:scale 45%](images/flyte.png)
+.g.g-middle.g-center[
+.g-6[
+![:scale 100%](images/flyte.png)
+]
+.g-6[
+![:scale 50%](images/qrcode.png)
+]
+]
 
 .larger[Thomas J. Fan]<br>
 <a href="https://www.github.com/thomasjpfan" target="_blank" class="title-link"><span class="icon icon-github right-margin"></span>@thomasjpfan</a>
@@ -1210,12 +1218,19 @@ def train():
 
 class: title-slide
 
-# Dive into Flytekit's Internals: A Python SDK to Quickly Bring your Code Into Production
+# Dive into Flytekit's Internals
+## A Python SDK to Quickly Bring your Code Into Production
 
-![:scale 45%](images/flyte.png)
+.g.g-middle.g-center[
+.g-6[
+![:scale 100%](images/flyte.png)
+]
+.g-6[
+![:scale 50%](images/qrcode.png)
+]
+]
 
 .larger[Thomas J. Fan]<br>
 <a href="https://www.github.com/thomasjpfan" target="_blank" class="title-link"><span class="icon icon-github right-margin"></span>@thomasjpfan</a>
 <a href="http://linkedin.com/in/thomasjpfan" target="_blank" class="this-talk-link">linkedin.com/in/thomasjpfan</a>
-<a class="this-talk-link" href="https://github.com/thomasjpfan/scipy-2025-flytekit" target="_blank">
-github.com/thomasjpfan/scipy-2025-flytekit</a>
+<a class="this-talk-link", href="https://github.com/thomasjpfan/scipy-2025-flytekit" target="_blank">github.com/thomasjpfan/scipy-2025-flytekit</a>
