@@ -4,90 +4,91 @@ class: title-slide
 
 # Dive into Flytekit's Internals: A Python SDK to Quickly Bring your Code Into Production
 
+![:scale 45%](images/flyte.png)
+
 .larger[Thomas J. Fan]<br>
 <a href="https://www.github.com/thomasjpfan" target="_blank" class="title-link"><span class="icon icon-github right-margin"></span>@thomasjpfan</a>
+<a href="http://linkedin.com/in/thomasjpfan" target="_blank" class="this-talk-link">linkedin.com/in/thomasjpfan</a>
 <a class="this-talk-link", href="https://github.com/thomasjpfan/scipy-2025-flytekit" target="_blank">github.com/thomasjpfan/scipy-2025-flytekit</a>
 
 ---
 
 # Introduction
 
-![](images/scikit-learn-logo-without-subtitle.svg)
-![](images/modal.png)
-![](images/flyte.png)
+.g.g-middle[
+.g-6[
+## OSS: Scikit-learn maintainer
+]
+.g-6.g-center[
+![:scale 50%](images/scikit-learn-logo-without-subtitle.svg)
+]
+]
+
+.g.g-middle[
+.g-6[
+## Member of Technical Staff @ Modal
+]
+.g-6.g-center[
+![:scale 80%](images/modal.png)
+]
+]
 
 
-- OSS: Scikit-learn maintainer
-- At Modal now
-- Previously, worked on the `flytekit` Python SDK
+.g.g-middle[
+.g-6[
+## Worked on Flyte & Python SDK
+]
+.g-6.g-center[
+![:scale 70%](images/flyte.png)
+]
+]
 
 ---
 
 # Contents
 
-.g[
-.g-6[
-1. Why Flyte?
-2. From Python to Remote Cluster
-3. Unraveling a Flyte Task
+.g.g-middle[
+.g-8.larger[
+## Why Flyte? 🛩️
+## From Python to Remote 🛜
+## Unraveling a Flyte Task 🧶
 ]
-.g-6[
-![](images/toc.jpg)
+.g-4.g-center[
+![:scale 100%](images/toc.jpg)
 ]
 ]
 
 ---
 
-# Why Flyte?
 
-.g[
-.g-6[
-- Reliable 🪢
+# Why Flyte? 🛩️
+
+.g.g-middle[
+.g-6.larger[
+## Reliable 🪢
+## Scalable 🗻
+## Iterate Fast 🏎️
 ]
-.g-6[
+.g-6.g-center[
 ![](images/flyte.png)
 ]
 ]
 
 ---
 
-# Why Flyte?
+# High level overview of Flyte ✈️
 
-.g[
-.g-6[
-- Reliable 🪢
-- Scalable 🗻
-]
-.g-6[
-![](images/flyte.png)
-]
-]
+<br>
+
+![](images/python-dag-cluster.png)
 
 ---
 
-# Why Flyte?
+class: top
 
-.g[
-.g-6[
-- Reliable 🪢
-- Scalable 🗻
-- Velocity 🏎️
-]
-.g-6[
-![](images/flyte.png)
-]
-]
+# Python Code to Static Workflow 🐍
 
----
-
-# High level overview of Flyte
-
-# TODO: Diagram of Python code -> DAG -> Kubernetes
-- Audience poll about Containers then Kubernetes
-
----
-
-# Python Code to Static Workflow
+## Task
 
 ```python
 from flytekit import task, workflow
@@ -99,7 +100,32 @@ def load_data() -> pd.DataFrame:
 @task
 def preprocess(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
 	...
+```
 
+--
+
+class: top
+
+## Workflow 👟
+
+```python
+@workflow
+def main() -> float:
+    data = load_data()
+    train, test = preprocess(data=data)
+    model = train_model(train=train)
+    return evaluate_model(model=model, data=test)
+```
+
+---
+
+class: top
+
+<br>
+
+# Python Code to Static Workflow 🐍
+
+```python
 @workflow
 def main() -> float:
     data = load_data()
@@ -109,6 +135,8 @@ def main() -> float:
 ```
 
 --
+
+## CLI
 
 ```bash
 pyflyte run --remote main.py wf
@@ -120,37 +148,44 @@ pyflyte run --remote main.py wf
 
 ---
 
-# Scaling up
+# Scaling up! 🆙
 
-# TODO finish up example code
 
 ```python
 from flytekit import map_task
 
 @workflow
-def main():
-	  datasets = query_many_datasets()
-    
-
+def scale_map_task():
+    datasets = query_many_datasets()
+    results = map_task(preprocess)(data=datasets)
 ```
 
----
-
-# Workflow: Serialized with protobuf
-
-# TODO show protobuf itself
-
-- Workflow can now be managed by Golang
+.center[
+![:scale 60%](images/map_task.png)
+]
 
 ---
 
-# Workflow to Kubernetes
+# Workflow: Serialized with Protobuf 🏞️
+## Workflow can now be managed by Golang
+
+![](images/workflow.jpg)
+
+---
+
+class: top
+
+<br>
+
+# Workflow to Kubernetes 🐳
 
 ```python
 @task
 def preprocess(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
 	...
 ```
+
+<br>
 
 --
 
@@ -168,20 +203,26 @@ Containers:
 
 ---
 
-# Review high level
+# Flyte @ High Level 🌎
+## From Local to Remote
 
-# TODO: Add diagram
-- Diagram of Python code -> DAG -> Kubernetes
+<br>
 
----
-
-class: title-slide
-
-# Deep Dive into Tasks
+![!scale 100%](images/python-dag-cluster.png)
 
 ---
 
-# Resources
+class: chapter-slide
+
+# Deep Dive into Tasks 🤿
+
+---
+
+class: top
+
+<br>
+
+# Resources (CPU & Memory) 💻
 
 ```python
 from flytekit import Resources
@@ -194,26 +235,28 @@ def train_model(train: pd.DataFrame) -> BaseEstimator:
 	...
 ```
 
+--
+
 ## Pod Spec
 
 ```yaml
 Requests:
-  cpu: 1
-  memory: 1Gi
-Limits:
   cpu: 2
-  memory: 4Gi
+  memory: 2Gi
+Limits:
+  cpu: 4
+  memory: 8Gi
 ```
 
 ---
 
-# Resources: GPU
+# Resources: GPU 🏎️
 
 ```python
 from flytekit.extras.accelerators import A100
 
 @task(
-	accelerator=A100
+*   accelerator=A100
 )
 def train_model(...):
 	...
@@ -230,59 +273,108 @@ tolerations:
 
 ---
 
-# Python Dependencies
+# Python Dependencies 🐍
 
 ## Prebuilt image
 
-# TODO update image string
-
 ```python
 @task(
-	container_image="ghcr.io/flyteorg"
+	container_image="ghcr.io/flyteorg/flytekit:py3.12-1.16.1"
 )
 def train_model(...):
-```
-
---
-
-```python
-from flytekit import ImageSpec
-
-image = ImageSpec(
-	packages=["numpy", "scikit-learn"]
-)
-```
-
-```python
-@task(container_image=image)
-def train_model(...):
+    ...
 ```
 
 ---
 
-# Local Code to Remote
+
+# Python Dependencies (ImageSpec) 🐍
+
+.g.g-middle[
+.g-6[
+```python
+from flytekit import ImageSpec
+
+image = ImageSpec(
+	packages=["numpy", "scikit-learn"],
+    registry="ghcr.io/thomasjpfan
+)
+
+@task(
+*   container_image=image
+)
+def train_model(...):
+    ...
+```
+]
+.g-6.g-center[
+![](images/docker_logo.png)
+]
+]
+
+---
+
+class: top
+
+<br>
+
+# Getting Local Code to Remote 🛜
 
 ```python
-from utils import split_data
+*from utils import split_data, create_features
 
 @task
 def preprocess(data: pd.DataFrame) ->  tuple[pd.DataFrame, pd.DataFrame]:
-	train, test = split_data(data)
+    featured_data = create_features
+	train, test = split_data(featured_data)
+    return train, tes
 ```
+
+--
+
+### Folder structure
 
 ```bash
 utils.py
 wf.py
 ```
 
+--
+
+### CLI
+
+```bash
+pyflyte run --remote wf.py main
+```
+
 ---
 
-# Non-Python files
+class: top
+
+<br>
+
+# Binary files
+
+### Folder structure
 
 ```bash
 bin/custom_executable
 wf.py
 ```
+
+--
+
+### Task code
+
+```python
+@task
+def run_executable():
+    run(["bin/custom_executable"], text=True)
+```
+
+--
+
+### CLI
 
 ```bash
 pyflyte run --remote --copy all wf.py main
@@ -290,9 +382,11 @@ pyflyte run --remote --copy all wf.py main
 
 ---
 
+class: top
+
 # How does container know about the code?
 
-## Entrypoint:
+### Entrypoint in Pod Spec:
 
 ```yaml
 Args:
@@ -302,17 +396,29 @@ Args:
   --dest-dir .
 ```
 
-## Which module to load?
+--
+
+### Which module to load?
+
+```python
+pyflyte run --remote wf.py preprocess
+```
+
+--
+
+### Entrypoint
 
 ```yaml
   pyflyte-execute ...
   --resolver flytekit.core.python_auto_container.default_task_resolver
   --
-  task-module wf
-  task-name preprocess
+* task-module wf
+* task-name preprocess
 ```
 
 ---
+
+class: top
 
 # Strict Typing
 
@@ -329,13 +435,18 @@ def hello_world_wf(name: str = "world") -> str:
     return greeting
 ```
 
-## Converted directly to "Flyte Literal" types
+--
 
-- `str`, `int`, `bool`, `float`
+### Converted directly to "Flyte Literal" types
 
-## Stored in object store (S3)
+- "Simple Python types": `str`, `int`, `bool`, `float`
+- Stored in object store (S3) as "metadata"
 
 ---
+
+class: top
+
+<br>
 
 # Dataclass-like types
 
@@ -353,16 +464,19 @@ def create_data() -> MyData:
     return MyData(name="abc", value=123)
 ```
 
-## Serialized with as `MessagePack`
-## Stored in object store (S3)
+--
+
+### Serialized with as `MessagePack`
+- Stored in object store (S3)
 
 ---
 
-# Offloaded types
+class: top
 
-## `FlyteFile` & `FlyteDirectory`
+# File type: `FlyteFile` 🗒️
+- Stored to Object store (S3)
 
-## Offloaded to Object store (S3)
+--
 
 ```python
 from flytekit import FlyteFile
@@ -376,7 +490,9 @@ def create_file() -> FlyteFile:
     return file
 ```
 
-## Downloaded when requested
+--
+
+### Downloaded when opened
 
 ```python
 @task
@@ -387,6 +503,46 @@ def read_file(file: FlyteFile) -> str:
 
 ---
 
+class: top
+
+<br>
+
+# Directory type: `FlyteDirectory` 🗃️
+- Stored to Object store (S3)
+
+--
+
+```python
+from flytekit import FlyteDirectory
+
+@task
+def create_directory() -> FlyteDirectory:
+    """Create directory of files and return it"""
+```
+
+--
+
+### Explicit Download
+
+```python
+@task
+def read_directory(directory: FlyteDirectory):
+    local_dir = directory.download()
+    # Use data in load_dir
+```
+
+---
+
+# Data is Offloaded to Object store
+
+.center[
+![:scale 60%](images/task-s3.png)
+]
+
+---
+
+class: top
+
 # Types in `flytekit`
 
 ```python
@@ -394,6 +550,10 @@ def read_file(file: FlyteFile) -> str:
 def make_dataset() -> np.ndarray:
 	return np.asarray([[1, 2, 3], [4, 5, 6]])
 ```
+
+--
+
+### Implementation
 
 ```python
 class NumpyArrayTransformer(AsyncTypeTransformer[np.ndarray]):
@@ -406,6 +566,10 @@ class NumpyArrayTransformer(AsyncTypeTransformer[np.ndarray]):
 		return np.load(...)
 ```
 
+--
+
+### Plugin Registration
+
 ```python
 from flytekit.core.type_engine import TypeEngine
 
@@ -416,7 +580,11 @@ TypeEngine.register(NumpyArrayTransformer())
 
 ---
 
-# Extending with Custom Type
+class: top
+
+<br>
+
+# Extending with Custom Type 🐻‍❄️
 
 ```python
 import polars as pl
@@ -426,21 +594,38 @@ def preprocess(df: pl.DataFrame) -> pl.DataFrame:
 	...
 ```
 
+--
+
+<br>
+
+### Installed with a Plugin
+
 ```bash
 pip install flytekitplugins-polars
 ```
-
-## Serialized into parquet files
+- Serialized into parquet files
 
 ---
 
-# How does Plugins get load?
+class: top
+
+<br>
+
+# How does Plugins get load? 🐻‍❄️
+
+### Entrypoint!
 
 ```python
 setup(
-    entry_points={"flytekit.plugins": [f"polars=flytekitplugins.polars"]},
+    entry_points={"flytekit.plugins": ["polars=flytekitplugins.polars"]},
 )
 ```
+
+--
+
+<br>
+
+### Registration during loading
 
 ```python
 StructuredDatasetTransformerEngine.register(PolarsDataFrameToParquetEncodingHandler())
@@ -451,13 +636,31 @@ StructuredDatasetTransformerEngine.register(ParquetToPolarsDataFrameDecodingHand
 
 ---
 
-# How is data passed between tasks?
+class: top
 
-- Show diagram of workflow
+<br>
+
+# How is data passed between tasks? 🔌
+
+![](images/workflow.jpg)
 
 --
 
-## Through the entrypoint with a Template:
+### Task runs in different Containers
+
+--
+
+### Data in Object Store
+
+--
+
+### Changes Between Executions
+
+---
+
+class: top
+
+# Dynamic Entrypoints with a Template 🖨️
 
 ```yaml
 Args:
@@ -465,16 +668,31 @@ Args:
   -additional-distribution s3://...
   --
   pyflyte-execute
-  --inputs {{.inputs}}
-  --output-prefix {{.outputPrefix}}
-  --raw-output-data-prefix {{.rawOutputDataPrefix}}
+* --inputs {{.inputs}}
+* --output-prefix {{.outputPrefix}}
+```
+
+--
+
+## Entrypoint is Populated by Flyte
+
+```yaml
+Args:
+  pyflyte-fast-execute
+  -additional-distribution s3://...
+  --
+  pyflyte-execute
+* --inputs s3://my-s3-bucket/metadata/.../data/inputs.pb
+* --output-prefix s3://my-s3-bucket/metadata/.../data/0
 ```
 
 ---
 
-# Entrypoint is Populated by Flyte:
+class: top
 
-## `inputs.pb` & `outputs.pb`
+<br>
+
+# Entrypoint is Populated by Flyte ✈️
 
 ```yaml
 Args:
@@ -482,19 +700,34 @@ Args:
   -additional-distribution s3://...
   --
   pyflyte-execute
-  --inputs s3://my-s3-bucket/metadata/.../data/inputs.pb
-  --output-prefix s3://my-s3-bucket/metadata/.../data/0
+* --inputs s3://my-s3-bucket/metadata/.../data/inputs.pb
+* --output-prefix s3://my-s3-bucket/metadata/.../data/0
 ```
+
+--
+
+### Serialized into `inputs.pb` & `outputs.pb`
 
 - Inputs: `s3://my-s3-bucket/metadata/.../data/inputs.pb`
 - Outputs: `s3://my-s3-bucket/metadata/.../data/0/outputs.pb`
 
+--
+
+- **Output Prefix**: `s3://my-s3-bucket/metadata/.../data/0`
+
 ---
 
-# What about errors?
+class: top
 
-- Errors:`s3://my-s3-bucket/metadata/.../data/0/errors.pb`
-- Screenshot of error
+# What about errors? ⚠️
+
+.center[
+![:scale 90%](images/error.png)
+]
+
+--
+
+- Errors: `s3://my-s3-bucket/metadata/.../data/0/errors.pb`
 
 ---
 
@@ -506,27 +739,77 @@ def query_environment():
 	...
 ```
 
+- **Output Prefix**: `s3://my-s3-bucket/metadata/.../data/0`
 - Static HTML: `s3://my-s3-bucket/metadata/.../data/0/deck.html`
 
 ---
 
-# Retries for "free"
+
+# Retries and caching 📖
+
+![](images/workflow-detailed.jpg)
+
+.g[
+.g-6[
+### Retries
 
 ```python
-@task(retries=5)
-def preprocess():
+@task(
+*   retries=5,
+)
+def preprocess(input: pd.DataFrame):
 	...
 ```
-
-## Show workflow DAG again
+]
+.g-6[
+]
+]
 
 ---
 
-# Language agnostic
+# Retries and caching 📖
 
-## `inputs.pb`, `outputs.pb` & `errors.pb`
+![](images/workflow-detailed.jpg)
+
+.g[
+.g-6[
+### Retries
+
+```python
+@task(
+*   retries=5,
+)
+def preprocess(input: pd.DataFrame):
+	...
+```
+]
+.g-6[
+### Caching
+
+```python
+@task(
+*   cache=True, cache_version="v1"
+)
+def preprocess(input: pd.DataFrame):
+    ...
+```
+]
+]
+
+---
+
+class: top
+
+# Language agnostic design! 🗺️
+
+- Metadata stored as `inputs.pb`, `outputs.pb` & `errors.pb` in S3/GCS/Minio
+- Raw Data (Model weights, etc) are stored in S3/GCS/Minio
+
+<br>
 
 --
+
+## Shell Script
 
 ```python
 t2 = ShellTask(
@@ -536,14 +819,18 @@ t2 = ShellTask(
     cp {inputs.x} {inputs.y}
     tar -zcvf {outputs.j} {inputs.y}
     """,
-    inputs=kwtypes(x=FlyteFile, y=FlyteDirectory),
-    output_locs=[OutputLocation(var="j", var_type=FlyteFile, location="{inputs.y}.tar.gz")],
+*   inputs=kwtypes(x=FlyteFile, y=FlyteDirectory),
+*   output_locs=[OutputLocation(var="j", var_type=FlyteFile, location="{inputs.y}.tar.gz")],
 )
 ```
 
 ---
 
-# Runtime variables
+class: top
+
+<br>
+
+# Dynamic Runtime variables 👟
 
 ```python
 from flytekit import current_context
@@ -556,6 +843,8 @@ def query_environment():
     print(ctx.execution_id.domain)
     print(ctx.execution_id.project)
 ```
+
+- Useful for sending execution data to another service
 
 --
 
@@ -570,7 +859,7 @@ Environment:
 
 ---
 
-# PodTemplates: Full Kubernetes Control
+# PodTemplates: Full Kubernetes Control 🐳
 
 ```python
 from flytekit import PodTemplate
@@ -587,33 +876,81 @@ pod_template = PodTemplate(
 	]
 )
 
-@task(container_image=pod_template)
+@task(
+*   container_image=pod_template
+)
 def my_task():
 	...
 ```
 
 ---
 
+class: top
+
 # Ray, Dask, Spark
+
+.g[
+.g-4[
+
+]
+.g-4[
+
+]
+.g-4[
+
+]
+]
+
+--
+
+class: top
 
 ## Running on your Cluster!
 
+.g.g-middle.g-center[
+.g-4[
+![](images/dask.jpg)
+]
+.g-4[
+![](images/ray.png)
+]
+.g-4[
+![:scale 90%](images/spark.png)
+]
+]
+
+--
+
+
+.g.g-middle[
+.g-6[
+### Powered by Kubernetes Operators
 - Ray: [kuberay](https://github.com/ray-project/kuberay)
 - Dask: [dask-kubernetes](https://github.com/dask/dask-kubernetes)
 - Spark: [spark-operator](https://github.com/kubeflow/spark-operator)
+]
+.g-6[
+![](images/kubernetes-logo.jpg)
+]
+]
+
 
 ---
 
+class: top
+
 # Dask
 
-Extension using `task_config`
-
+.g.g-middle[
+.g-8[
 ```python
 from flytekit import Resources, task
-from flytekitplugins.dask import Dask, Scheduler, WorkerGroup
+from flytekitplugins.dask import (
+    Dask, Scheduler, WorkerGroup
+)
 
 @task(
-  task_config=Dask(
+* task_config=Dask(
       scheduler=Scheduler(
           limits=Resources(cpu="1", mem="2Gi"),
       ),
@@ -625,205 +962,216 @@ from flytekitplugins.dask import Dask, Scheduler, WorkerGroup
 def dask_preprocessing():
 	...
 ```
+]
+.g-4[
+![](images/dask.jpg)
+]
+]
 
----
+--
 
-# How does `task_config=Dask` work?
+### Install Plugin
 
 ```bash
 pip install flytekitplugins-dask
 ```
 
-## Loaded when `flytekitplugins.dask.Dask` is imported
+---
+
+# Under the Hook (Dask)
+
+![](images/dask-workflow.png)
+
+---
+
+class: top
+
+# How does `task_config=Dask(...)` work? 🤔
+
+```python
+@task(task_config=Dask(...))
+def dask_preprocessing():
+```
+
+--
+
+```python
+@dataclass
+class Dask:
+    scheduler: Scheduler
+    workers: WorkerGroup
+```
+
+--
+
+## Declare Resources in `DaskTask`
+
+```python
+class DaskTask(PythonFunctionTask[Dask]):
+*   _DASK_TASK_TYPE = "dask"
+
+    def __init__(self, ...):
+*       return super().__init__(task_type=self._DASK_TASK_TYPE)
+```
+
+--
+
+```python
+    def get_custom(self, settings) -> Dict[str, Any]:
+        # construct dictionary representing resources specified in the Dask dataclass
+```
+
+--
 
 ```python
 TaskPlugins.register_pythontask_plugin(Dask, DaskTask)
 ```
 
+.footnote-back[
 [plugins/flytekit-dask/flytekitplugins/dask/task.py](https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-dask/flytekitplugins/dask/task.py)
+]
 
 ---
 
-# Spark
+# Spark ✨
 
+.g.g-middle[
+.g-8[
 ```python
 from flytekitplugins.spark import Spark
 
+spark_config = Spark(
+    spark_conf={
+        "spark.driver.memory": "1000M",
+        "spark.executor.memory": "1000M",
+        "spark.executor.cores": "1",
+        "spark.executor.instances": "2",
+        "spark.driver.cores": "1",
+        "spark.jars": "https://storage.googleapis.com/hadoop-lib/gcs/gcs-connector-hadoop3-latest.jar",
+    }
+)
+
 @task(
-    task_config=Spark(
-        spark_conf={
-            "spark.driver.memory": "1000M",
-            "spark.executor.memory": "1000M",
-            "spark.executor.cores": "1",
-            "spark.executor.instances": "2",
-            "spark.driver.cores": "1",
-            "spark.jars": "https://storage.googleapis.com/hadoop-lib/gcs/gcs-connector-hadoop3-latest.jar",
-        }
-    ),
+*   task_config=spark_config
 )
 def hello_spark(partitions: int) -> float:
+    ...
 ```
+]
+.g-4[
+![](images/spark.png)
+]
+]
 
 ---
 
 # Ray
 
+.g.g-middle[
+.g-8[
 ```python
-from flytekitplugins.ray import HeadNodeConfig, RayJobConfig, WorkerNodeConfig
+from flytekitplugins.ray import (
+    HeadNodeConfig, RayJobConfig, WorkerNodeConfig
+)
 
 ray_config = RayJobConfig(
-    head_node_config=HeadNodeConfig(ray_start_params={"log-color": "True"}),
-    worker_node_config=[WorkerNodeConfig(group_name="ray-group", replicas=1)],
+    head_node_config=...,
+    worker_node_config=...,
     runtime_env={"pip": ["numpy", "pandas"]},
 )
 
 @task(
-    task_config=ray_config,
+*   task_config=ray_config,
     requests=Resources(mem="2Gi", cpu="2"),
     container_image=custom_image,
 )
 def ray_task(n: int) -> typing.List[int]:
-```
-
----
-
-# Flyte Overview
-
-- Python -> DAG -> Kubernetes
-- Review everything
-
-# Why Flyte
-- Conclusion - Why Flyte?
-	- Python -> DAG -> Kubernetes
-	- Reliable
-	- Scalable
-	- Velocity
-
-# Backend architecture
-- https://www.union.ai/docs/flyte/architecture/component-architecture/flytepropeller_architecture/
-
-# Conclusion
-- Slack
-- Slides
-- Me
-
----
-
-class: middle, center
-
-# Before we start :)
-
-.g[
-.g-6[.success.bold.center[
-    If you are from NYC, **Push 1**.
-]]
-
-.g-6[.alert.bold.center[
-    Otherwise, **Push 2**.
-]]
-]
-
----
-
-class: middle
-
-> Creativity is just connecting things. When you ask creative people how they did something,
-> they feel a little guilty because they didn't really do it, they just saw something.
-> It seemed obvious to them after a while. That's because they were able to connect
-> experiences they've had and synthesize new things.
->
-> <cite>Steve Jobs</cite>
-
----
-
-# This is an image
-
-
-![:scale 40%](images/favicon_org.png)
-
----
-
-# This is a equation
-
-$$
-F=ma
-$$
-
----
-
-# This is some code
-
-.g[
-.g-6[
-```python
-# This is a comment
-def hello(a, b):
-    return a + b
+    ...
 ```
 ]
-.g-6[
-
-```ruby
-def add(a, b)
-  a + b
-end
-```
-]
-]
-
----
-
-# This is huge
-
-.g.g-around[
-.g-8.success.bold.center[
-    This is wowowowow
-]]
-
-## Here is some numpy
-
-```py
->>> df['int_1'].values
-array([     0,      1,      2, ..., 999997, 999998, 999999])
-```
-
-
----
-
-# Here is some code
-
-.g[
 .g-4[
-This is a [link](https://thomasjpfan.com) about something interesting here
+![](images/ray.png)
 ]
+]
+
+---
+
+# Pytorch Elastic Training  🔥
+
+.g.g-middle[
 .g-8[
 ```python
-import numpy as np
+from flytekitplugins.kfpytorch import Elastic
 
-X = np.linspace(0, 10)
+@task(
+* task_config=Elastic(
+    nnodes=2,
+    nproc_per_node=4,
+  ),
+)
+def train():
+    ...
 ```
 ]
+.g-4[
+![](images/pytorch.png)
 ]
-
+]
 
 ---
 
-# Here is a table
+# High level overview of Flyte ✈️
 
-| train has infreq | error  | ignore            | infreq_ignore       |   |
-|------------------|--------|-------------------|---------------------|---|
-| True             | errors | all zeros (werid) | place in infreq bin |   |
-| False            | errors | all zeros         | all zeros           |   |
+<br>
+
+![](images/python-dag-cluster.png)
+
+---
+
+# Backend architecture 🔬
+
+.center[
+![:scale 65%](images/flytepropeller-architecture.png)
+]
+
+.footnote-back[
+[union.ai/docs/flyte/architecture/component-architecture/flytepropeller_architecture/](https://www.union.ai/docs/flyte/architecture/component-architecture/flytepropeller_architecture/)
+]
+
+---
+
+
+.g.g-middle[
+.g-8[
+# Why Flyte?
+
+## Reliable 🪢
+- Build on top of **Kubernetes**
+- Static Workflow Graphs & Embracing Python Typing
+
+## Scalable 🗻
+- GPUs + Dask, Ray, Spark, PyTorch Distributed
+- `map_task` for Parallelism
+
+## Iterate Fast 🏎️
+- Local Python code to Remote
+- Recover from failures
+]
+.g-4.g-center[
+![](images/flyte.png)
+]
+]
 
 ---
 
 class: title-slide
 
-# Thank you!
+# Dive into Flytekit's Internals: A Python SDK to Quickly Bring your Code Into Production
+
+![:scale 45%](images/flyte.png)
 
 .larger[Thomas J. Fan]<br>
-@thomasjpfan<br>
-<a href="https://www.github.com/thomasjpfan" target="_blank"><span class="icon icon-github icon-left"></span></a>
-<a href="https://www.twitter.com/thomasjpfan" target="_blank"><span class="icon icon-twitter"></span></a>
-<a class="this-talk-link", href="https://github.com/thomasjpfan/slides-template" target="_blank">
-This talk on Github: thomasjpfan/slides-template</a>
+<a href="https://www.github.com/thomasjpfan" target="_blank" class="title-link"><span class="icon icon-github right-margin"></span>@thomasjpfan</a>
+<a href="http://linkedin.com/in/thomasjpfan" target="_blank" class="this-talk-link">linkedin.com/in/thomasjpfan</a>
+<a class="this-talk-link" href="https://github.com/thomasjpfan/scipy-2025-flytekit" target="_blank">
+github.com/thomasjpfan/scipy-2025-flytekit</a>

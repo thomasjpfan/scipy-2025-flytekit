@@ -1,6 +1,6 @@
-# Template for Slides + Remark
+# Dive into Flytekit's Internals: A Python SDK to Quickly Bring your Code Into Production
 
-[Link to slides](https://thomasjpfan.github.io/slides-template/)
+[Link to slides](https://thomasjpfan.github.io/scipy-2025-flytekit)
 
 ## License
 
