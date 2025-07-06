@@ -319,6 +319,7 @@ class: top
 <br>
 
 # Getting Local Code to Remote 🛜
+### "Fast Registration"
 
 ```python
 *from utils import split_data, create_features
