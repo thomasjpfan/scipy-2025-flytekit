@@ -72,13 +72,13 @@ class: title-slide
 # Why Flyte? 🛩️
 
 .g.g-middle[
-.g-6.larger[
+.g-5.larger[
 ## Reliable 🪢
 ## Scalable 🗻
 ## Iterate Fast 🏎️
 ]
-.g-6.g-center[
-![](images/flyte.png)
+.g-7.g-center[
+![](images/flyte-linux.png)
 ]
 ]
 
