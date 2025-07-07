@@ -5,7 +5,7 @@ class: title-slide
 # Dive into Flytekit's Internals
 ## A Python SDK to Quickly Bring your Code Into Production
 
-![:scale 50%](images/flyte.png)
+![:scale 45%](images/flyte.png)
 
 .g.g-middle.g-center[
 .g-8[
@@ -15,7 +15,7 @@ class: title-slide
 <a class="this-talk-link", href="https://github.com/thomasjpfan/scipy-2025-flytekit" target="_blank">github.com/thomasjpfan/scipy-2025-flytekit</a>
 ]
 .g-4[
-![:scale 80%](images/qrcode.png)
+![:scale 90%](images/qrcode.png)
 ]
 ]
 
@@ -1221,7 +1221,7 @@ class: title-slide
 # Dive into Flytekit's Internals
 ## A Python SDK to Quickly Bring your Code Into Production
 
-![:scale 50%](images/flyte.png)
+![:scale 45%](images/flyte.png)
 
 .g.g-middle.g-center[
 .g-8[
@@ -1231,6 +1231,6 @@ class: title-slide
 <a class="this-talk-link", href="https://github.com/thomasjpfan/scipy-2025-flytekit" target="_blank">github.com/thomasjpfan/scipy-2025-flytekit</a>
 ]
 .g-4[
-![:scale 75%](images/qrcode.png)
+![:scale 80%](images/qrcode.png)
 ]
 ]
