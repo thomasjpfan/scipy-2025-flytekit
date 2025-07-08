@@ -156,24 +156,6 @@ pyflyte run --remote main.py wf
 
 ---
 
-# Scaling up! 🆙
-
-
-```python
-from flytekit import map_task
-
-@workflow
-def scale_map_task():
-    datasets = query_many_datasets()
-    results = map_task(preprocess)(data=datasets)
-```
-
-.center[
-![:scale 60%](images/map_task.png)
-]
-
----
-
 # Workflow: Serialized with Protobuf 🏞️
 ## Workflow can now be managed by Golang
 
@@ -305,7 +287,7 @@ from flytekit import ImageSpec
 
 image = ImageSpec(
 	packages=["numpy", "scikit-learn"],
-    registry="ghcr.io/thomasjpfan
+    registry="ghcr.io/thomasjpfan"
 )
 
 @task(
@@ -356,6 +338,8 @@ wf.py
 pyflyte run --remote wf.py main
 ```
 
+- Uploads to Object store (S3)
+
 ---
 
 class: top
@@ -388,6 +372,8 @@ def run_executable():
 ```bash
 pyflyte run --remote --copy all wf.py main
 ```
+
+- Uploads to Object store (S3)
 
 ---
 
@@ -501,7 +487,7 @@ def create_file() -> FlyteFile:
 
 --
 
-### Downloaded when opened
+### Downloaded when used
 
 ```python
 @task
@@ -542,7 +528,7 @@ def read_directory(directory: FlyteDirectory):
 
 ---
 
-# Data is Offloaded to Object store
+# Data is Stored to Object store
 
 .center[
 ![:scale 60%](images/task-s3.png)
@@ -562,7 +548,7 @@ def make_dataset() -> np.ndarray:
 
 --
 
-### Implementation
+### Type Transformer!
 
 ```python
 class NumpyArrayTransformer(AsyncTypeTransformer[np.ndarray]):
@@ -713,16 +699,12 @@ Args:
 * --output-prefix s3://my-s3-bucket/metadata/.../data/0
 ```
 
---
-
 ### Serialized into `inputs.pb` & `outputs.pb`
 
 - Inputs: `s3://my-s3-bucket/metadata/.../data/inputs.pb`
+- **Output Prefix**: `s3://my-s3-bucket/metadata/.../data/0`
 - Outputs: `s3://my-s3-bucket/metadata/.../data/0/outputs.pb`
 
---
-
-- **Output Prefix**: `s3://my-s3-bucket/metadata/.../data/0`
 
 ---
 
@@ -740,10 +722,14 @@ class: top
 
 ---
 
+class: top
+
+<br>
+
 # Flyte Deck
 
 .g.g-middle[
-.g-7[
+.g-8[
 ```python
 from flytekitplugins.deck.renderer import (
     FrameProfilingRenderer
@@ -759,7 +745,7 @@ def create_deck():
     )
 ```
 ]
-.g-5.g-center[
+.g-4.g-center[
 ![:scale 100%](images/deck.jpg)
 ]
 ]
@@ -774,10 +760,10 @@ def create_deck():
 # Flyte Deck (With Types)
 
 .g.g-middle[
-.g-7[
+.g-8[
 ```python
 class DataFrameSummaryRenderer:
-    def to_html(self, df: pd.DataFrame) -> str:
+*   def to_html(self, df: pd.DataFrame) -> str:
         # Creates HTML from df
 
 @task(enable_deck=True)
@@ -790,7 +776,7 @@ def create_deck_with_typing() -> (
     return df
 ```
 ]
-.g-5.g-center[
+.g-4.g-center[
 ![:scale 100%](images/deck.jpg)
 ]
 ]
@@ -852,12 +838,12 @@ def preprocess(input: pd.DataFrame):
 
 class: top
 
+<br>
+
 # Language agnostic design! 🗺️
 
 - Metadata stored as `inputs.pb`, `outputs.pb` & `errors.pb` in S3/GCS/Minio
 - Raw Data (Model weights, etc) are stored in S3/GCS/Minio
-
-<br>
 
 --
 
@@ -934,29 +920,29 @@ pod_template = PodTemplate(
 def my_task():
 	...
 ```
+---
+
+# Scaling up! 🆙
+
+
+```python
+from flytekit import map_task
+
+@workflow
+def scale_map_task():
+    datasets = query_many_datasets()
+    results = map_task(preprocess)(data=datasets)
+```
+
+.center[
+![:scale 60%](images/map_task.png)
+]
 
 ---
 
 class: top
 
 # Ray, Dask, Spark
-
-.g[
-.g-4[
-
-]
-.g-4[
-
-]
-.g-4[
-
-]
-]
-
---
-
-class: top
-
 ## Running on your Cluster!
 
 .g.g-middle.g-center[
@@ -1020,8 +1006,6 @@ def dask_preprocessing():
 ]
 ]
 
---
-
 ### Install Plugin
 
 ```bash
@@ -1037,6 +1021,8 @@ pip install flytekitplugins-dask
 ---
 
 class: top
+
+<br>
 
 # How does `task_config=Dask(...)` work? 🤔
 
@@ -1060,22 +1046,9 @@ class Dask:
 
 ```python
 class DaskTask(PythonFunctionTask[Dask]):
-*   _DASK_TASK_TYPE = "dask"
-
-    def __init__(self, ...):
-*       return super().__init__(task_type=self._DASK_TASK_TYPE)
-```
-
---
-
-```python
     def get_custom(self, settings) -> Dict[str, Any]:
         # construct dictionary representing resources specified in the Dask dataclass
-```
 
---
-
-```python
 TaskPlugins.register_pythontask_plugin(Dask, DaskTask)
 ```
 
