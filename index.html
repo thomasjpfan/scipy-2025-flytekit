@@ -666,17 +666,30 @@ class: top
 
 ![](images/workflow.jpg)
 
---
-
 ### Task runs in Different Containers 🐳
-
---
-
 ### Data in Object Store 🏪
-
---
-
 ### Location Changes Between Executions 🔄
+
+---
+
+# Dynamic Entrypoints with a Template 🖨️
+
+```python
+class PythonAutoContainerTask(...):
+    def get_default_command(self, settings):
+        container_args = [
+            "pyflyte-execute",
+            "--inputs",
+            "{{.input}}",
+            "--output-prefix",
+            "{{.outputPrefix}}",
+            "--raw-output-data-prefix",
+            "{{.rawOutputDataPrefix}}",
+            ...
+        ]
+        return container_args
+```
+
 
 ---
 
