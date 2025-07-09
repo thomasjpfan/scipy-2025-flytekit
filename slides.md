@@ -560,13 +560,14 @@ def make_dataset() -> np.ndarray:
 
 ```python
 class NumpyArrayTransformer(AsyncTypeTransformer[np.ndarray]):
-    async def async_to_literal(self, ...);
+*   async def async_to_literal(self, ...);
 		# Serialize data
 	    np.save(...)
+        return Literal(...)
 
-	async def async_to_python_value(self, ...):
-		# Deserialize data
-		return np.load(...)
+*   async def async_to_python_value(self, ...):
+        # Deserialize data
+        return np.load(...)
 ```
 
 --
@@ -678,6 +679,10 @@ class PythonAutoContainerTask(...):
         ]
         return container_args
 ```
+
+.footnote-back[
+[flytekit/core/python_auto_container.py](https://github.com/flyteorg/flytekit/blob/master/flytekit/core/python_auto_container.py)
+]
 
 
 ---
