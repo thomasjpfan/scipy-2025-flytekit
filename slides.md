@@ -147,7 +147,7 @@ def main() -> float:
 ## CLI
 
 ```bash
-pyflyte run --remote main.py wf
+pyflyte run --remote main.py main
 ```
 
 --
@@ -413,11 +413,27 @@ pyflyte run --remote wf.py preprocess
 
 ---
 
+# Strict Typing 🔥
+## Types must match!
+
+```python
+@task
+*def add_one(x: int) -> int:
+    return x + 1
+
+
+@workflow
+*def wf(x: str):
+    add_one(x=x)
+```
+
+---
+
 class: top
 
-# Strict Typing
+<br><br>
 
-## Literal Types
+# Literal Types
 
 ```python
 @task
@@ -461,7 +477,7 @@ def create_data() -> MyData:
 
 --
 
-### Serialized with as `MessagePack`
+### Serialized with `MessagePack`
 - Stored in object store (S3)
 
 ---
@@ -525,14 +541,6 @@ def read_directory(directory: FlyteDirectory):
     local_dir = directory.download()
     # Use data in load_dir
 ```
-
----
-
-# Data is Stored to Object store
-
-.center[
-![:scale 60%](images/task-s3.png)
-]
 
 ---
 
@@ -628,6 +636,14 @@ StructuredDatasetTransformerEngine.register(ParquetToPolarsDataFrameDecodingHand
 ```
 
 [plugins/flytekit-polars/flytekitplugins/polars/sd_transformers.py](https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-polars/flytekitplugins/polars/sd_transformers.py)
+
+---
+
+# Data is Stored to Object store
+
+.center[
+![:scale 60%](images/task-s3.png)
+]
 
 ---
 
